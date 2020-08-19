@@ -19,8 +19,7 @@ namespace Quotes.Controllers
                 Id = 1,
                 Author = "Умар Хайям",
                 Quote = "Меняем реки, страны, города... Иные двери... Новые года... А никуда нам от себя не деться, А если деться - только в никуда.",
-                Category="Жизнь",
-                Date = DateTime.Now.AddHours(-23)
+                Category="Жизнь"
             
             },
 
@@ -32,8 +31,7 @@ namespace Quotes.Controllers
                       "Стал, в погоне за истиной, сух и угрюм. " +
                       "Притязающий с детства на знание жизни, " +
                       "Виноградом не став, превратился в изюмю",
-                Category="Мудрость",
-                Date = DateTime.Now.AddHours(-24)
+                Category="Мудрость"
             }
         };
 
@@ -56,7 +54,6 @@ namespace Quotes.Controllers
             var Id = quotesList.Select(t => t.Id).Max();
             Id++;
             quoteModels.Id = Id;
-            quoteModels.Date = DateTime.Now;
             quotesList.Add(quoteModels);
             return Ok(new { massage = "Добавлено" });
         }
