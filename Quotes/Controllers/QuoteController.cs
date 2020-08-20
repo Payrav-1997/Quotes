@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Quotes.Models;
+using SocialApp.Services;
 
 namespace Quotes.Controllers
 {
@@ -19,27 +20,32 @@ namespace Quotes.Controllers
                 Id = 1,
                 Author = "Умар Хайям",
                 Quote = "Меняем реки, страны, города... Иные двери... Новые года... А никуда нам от себя не деться, А если деться - только в никуда.",
-                Category="Жизнь"
-            
+                Category="Жизнь",
+                 Date = DateTime.Now.AddHours(-23)
+
             },
 
             new QuoteModels()
             {
-                Id =1,
+                Id =2,
                 Author = "",
                 Quote="Тот, кто с юности верует в собственный ум, " +
                       "Стал, в погоне за истиной, сух и угрюм. " +
                       "Притязающий с детства на знание жизни, " +
                       "Виноградом не став, превратился в изюмю",
-                Category="Мудрость"
+                Category="Мудрость",
+                 Date = DateTime.Now.AddHours(-24)
             }
         };
 
+        public static List<Subscribers> subscribersList = new List<Subscribers>();
+
         [HttpGet]
-        [Route("GetCategory")]
-        public IActionResult GetCategory(string category)
+        [Route("GetCategory/{category}")]
+        public IActionResult GetCategory([FromRoute]string category)
         {
-            return Ok(quotesList.Where(t => t.Category.ToLower().Contains(category.ToLower())));
+            if (string.IsNullOrEmpty(category)) return NotFound();
+            return Ok(quotesList.Where(t => t.Category.Contains(category, StringComparison.InvariantCultureIgnoreCase)));
         }
 
 
@@ -47,13 +53,14 @@ namespace Quotes.Controllers
         [HttpPost]
         public IActionResult Quote([FromBody] QuoteModels quoteModels)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var Id = quotesList.Select(t => t.Id).Max();
             Id++;
             quoteModels.Id = Id;
+            quoteModels.Date = DateTime.Now;
             quotesList.Add(quoteModels);
             return Ok(new { massage = "Добавлено" });
         }
@@ -68,20 +75,30 @@ namespace Quotes.Controllers
 
         [Route("Edit")]
         [HttpPut]
-        public IActionResult Edit([FromRoute]int id,[FromBody] QuoteModels quoteModels)
-        {  
-                quotesList.ForEach(t =>
+        public IActionResult Edit([FromRoute]int id, [FromBody] QuoteModels quoteModels)
+        {
+            quotesList.ForEach(t =>
+            {
+                if (t.Id == id)
                 {
-                    if (t.Id == id)
-                    {
-                        t.Quote = quoteModels.Quote;
-                        t.Author = quoteModels.Author;
-                        t.Category = quoteModels.Category;
-                    }
-                });
-                return Ok(new { massage = "Изменено" });
-            
-           
+                    t.Quote = quoteModels.Quote;
+                    t.Author = quoteModels.Author;
+                    t.Category = quoteModels.Category;
+                }
+            });
+            return Ok(new { massage = "Изменено" });
+        }
+        [Route("Subscribe")]
+        [HttpPost]
+        public IActionResult Edit([FromBody] Subscribers subscribers)
+        {
+            subscribers.Id = Guid.NewGuid();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            subscribersList.Add(subscribers);
+            return Ok(new { massage = "Успешно подписанны" });
         }
     }
 }
