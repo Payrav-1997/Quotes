@@ -48,6 +48,21 @@ namespace Quotes.Controllers
             return Ok(quotesList.Where(t => t.Category.Contains(category, StringComparison.InvariantCultureIgnoreCase)));
         }
 
+        [HttpGet]
+        [Route("RandomQuotes")]
+        public IActionResult RandomQuotes()
+        {
+            var quote = quotesList[new Random().Next(quotesList.Count)];
+            return Ok(quote);
+        }
+
+        [HttpGet]
+        [Route("GetAllQuotes")]
+        public IActionResult GetAllQuotes()
+        {
+            return Ok(quotesList);
+        }
+
 
         [Route("Quote")]
         [HttpPost]
